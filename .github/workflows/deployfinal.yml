@@ -72,17 +72,17 @@ jobs:
     - name: 📤 Copy stack.yml to VPS
       uses: appleboy/scp-action@v1
       with:
-        host: ${{ secrets.VPS_HOST }}
+        host: 161.97.140.245
         username: ${{ secrets.VPS_USER }}
         password: ${{ secrets.VPS_PASSWORD }}
-        port: 161.97.140.245
+        port: 22
         source: "stack.yml"
         target: "/home/${{ secrets.VPS_USER }}/automatizar"
 
     - name: 🚀 Deploy services on VPS
       uses: appleboy/ssh-action@v1
       with:
-        host: ${{ secrets.VPS_HOST }}
+        host: 161.97.140.245
         username: ${{ secrets.VPS_USER }}
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
