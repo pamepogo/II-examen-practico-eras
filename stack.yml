@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   eras:
-    image: ghcr.io/byronmoreno/eras:1.0.5
+    image: ghcr.io/pamepogo/eras:1.0.5
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     deploy:
