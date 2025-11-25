@@ -29,7 +29,7 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
-    <h1>🚀 Aplicación Flask con IA - Eras</h1>
+    <h1>🚀 EXAMEN DE DEVOPS</h1>
     <div class="container">
         <h2>Chat con Claude AI</h2>
         <input type="text" id="message" placeholder="Escribe tu mensaje aquí...">
