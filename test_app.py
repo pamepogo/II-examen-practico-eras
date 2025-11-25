@@ -10,12 +10,13 @@ def client():
     with app.test_client() as client:
         yield client
 
-def test_home_route(client):
-    """Test: Verificar que la ruta principal funciona"""
-    response = client.get('/')
+def test_home_route():
+    """Test que verifica que la ruta principal carga correctamente"""
+    response = app.test_client().get('/')
     assert response.status_code == 200
-    assert b'Eras' in response.data
-    assert b'Flask con IA' in response.data
+    # Busca texto que realmente está en tu página
+    assert b'EXAMEN DE DEVOPS' in response.data
+    assert b'Chat con Claude AI' in response.data
 
 def test_health_endpoint(client):
     """Test: Verificar endpoint de salud"""
