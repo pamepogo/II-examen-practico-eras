@@ -69,7 +69,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 📤 Copy stack.yml to VPS
+    - name:  Copy stack.yml to VPS
       uses: appleboy/scp-action@v1
       with:
         host: ${{ secrets.VPS_HOST }}
@@ -79,7 +79,7 @@ jobs:
         source: "stack.yml"
         target: "/home/${{ secrets.VPS_USER }}/automatizar"
 
-    - name: 🚀 Deploy services on VPS
+    - name:  Deploy services on VPS
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.VPS_HOST }}
@@ -87,7 +87,7 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: ${{ secrets.VPS_SSH_PORT }}
         script: |
-          echo "🔐 Logging in to GHCR..."
+          echo " Logging in to GHCR..."
           echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u byronmoreno --password-stdin
           
           echo " Pulling latest image..."

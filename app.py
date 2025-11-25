@@ -12,7 +12,7 @@ HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eras - IA DevOps</title>
+    <title>Eras - Con IA DevOps</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
         h1 { color: #2c3e50; }
