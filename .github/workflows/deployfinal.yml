@@ -1,4 +1,4 @@
-name: Despliegue Eras
+name: Despliegue con Eras
 
 on:
   push:
