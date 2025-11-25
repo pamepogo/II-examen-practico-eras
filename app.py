@@ -4,15 +4,20 @@ import os
 
 app = Flask(__name__)
 
-# Inicializar cliente de Anthropic (Claude AI)
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+# NO inicializar el cliente aquí, sino cuando se necesite
+def get_anthropic_client():
+    """Función para obtener el cliente de Anthropic de forma lazy"""
+    if not hasattr(get_anthropic_client, 'client'):
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        get_anthropic_client.client = Anthropic(api_key=api_key) if api_key else None
+    return get_anthropic_client.client
 
 # Template HTML simple
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eras - Con IA DevOps</title>
+    <title>Eras - IA DevOps</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
         h1 { color: #2c3e50; }
@@ -24,9 +29,9 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
-    <h1> Aplicación Flask con IA - Eras</h1>
+    <h1>🚀 Aplicación Flask con IA - Eras</h1>
     <div class="container">
-        <h2>Chat AI</h2>
+        <h2>Chat con Claude AI</h2>
         <input type="text" id="message" placeholder="Escribe tu mensaje aquí...">
         <button onclick="sendMessage()">Enviar</button>
         <div id="response"></div>
@@ -90,13 +95,19 @@ def saludo(nombre):
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    """Endpoint para chatear AI"""
+    """Endpoint para chatear con Claude AI"""
     try:
         data = request.json
         message = data.get('message', '')
         
         if not message:
             return jsonify({"error": "No se proporcionó ningún mensaje"}), 400
+        
+        # Obtener cliente de forma lazy
+        client = get_anthropic_client()
+        
+        if not client:
+            return jsonify({"error": "API key no configurada"}), 500
         
         # Llamar a la API de Claude
         response = client.messages.create(

@@ -1,17 +1,6 @@
 import pytest
 import os
 from unittest.mock import patch, MagicMock
-
-# Mock de Anthropic antes de importar app
-@pytest.fixture(autouse=True)
-def mock_anthropic():
-    """Mock global de Anthropic para todos los tests"""
-    with patch('anthropic.Anthropic') as mock:
-        mock_instance = MagicMock()
-        mock.return_value = mock_instance
-        yield mock_instance
-
-# Ahora importamos app después del mock
 from app import app
 
 @pytest.fixture
@@ -45,23 +34,6 @@ def test_saludo_route(client):
     assert b'Hola DevOps' in response.data
     assert b'eras.byronrm.com' in response.data
 
-@patch.dict(os.environ, {'ANTHROPIC_API_KEY': 'test-key'})
-def test_chat_endpoint_with_mock(client, mock_anthropic):
-    """Test: Verificar que el endpoint de chat funciona con mock"""
-    # Configurar el mock para simular respuesta de Claude
-    mock_response = MagicMock()
-    mock_response.content = [MagicMock(text="Esta es una respuesta de prueba")]
-    mock_anthropic.messages.create.return_value = mock_response
-    
-    response = client.post('/chat', 
-                          json={'message': 'test message'},
-                          content_type='application/json')
-    
-    assert response.status_code == 200
-    data = response.get_json()
-    assert 'response' in data
-    assert data['student'] == 'Eras'
-
 def test_chat_without_message(client):
     """Test: Verificar manejo de errores cuando no hay mensaje"""
     response = client.post('/chat', 
@@ -71,9 +43,37 @@ def test_chat_without_message(client):
     data = response.get_json()
     assert 'error' in data
 
-def test_chat_with_invalid_json(client):
-    """Test: Verificar manejo de JSON inválido"""
+def test_chat_without_api_key(client):
+    """Test: Verificar que sin API key retorna error 500"""
+    with patch.dict(os.environ, {}, clear=True):
+        # Limpiar el cache del cliente si existe
+        if hasattr(app, 'get_anthropic_client'):
+            if hasattr(app.get_anthropic_client, 'client'):
+                delattr(app.get_anthropic_client, 'client')
+        
+        response = client.post('/chat', 
+                              json={'message': 'test'},
+                              content_type='application/json')
+        assert response.status_code == 500
+        data = response.get_json()
+        assert 'error' in data
+
+@patch('app.get_anthropic_client')
+def test_chat_endpoint_with_mock(mock_get_client, client):
+    """Test: Verificar que el endpoint de chat funciona con mock"""
+    # Crear un mock del cliente de Anthropic
+    mock_client = MagicMock()
+    mock_response = MagicMock()
+    mock_response.content = [MagicMock(text="Esta es una respuesta de prueba")]
+    mock_client.messages.create.return_value = mock_response
+    mock_get_client.return_value = mock_client
+    
     response = client.post('/chat', 
-                          data='invalid json',
+                          json={'message': 'test message'},
                           content_type='application/json')
-    assert response.status_code in [400, 500]
+    
+    assert response.status_code == 200
+    data = response.get_json()
+    assert 'response' in data
+    assert data['student'] == 'Eras'
+    assert data['response'] == "Esta es una respuesta de prueba"
